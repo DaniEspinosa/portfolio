@@ -10,6 +10,7 @@
   --accent: #6366f1;
   --accent-hover: #818cf8;
   --nav-bg: rgba(12, 12, 14, 0.85);
+  --menu-bg: rgba(12, 12, 14, 0.97);
   --blob-opacity: 1;
 }
 
@@ -23,6 +24,7 @@
   --accent: #6366f1;
   --accent-hover: #4f46e5;
   --nav-bg: rgba(245, 245, 247, 0.85);
+  --menu-bg: rgba(245, 245, 247, 0.97);
   --blob-opacity: 0.75;
 }
 

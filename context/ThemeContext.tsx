@@ -14,7 +14,22 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const saved = localStorage.getItem("theme") as Theme | null;
-    const resolved = saved ?? "dark";
+    let resolved: Theme;
+    if (saved) {
+      resolved = saved;
+    } else {
+      // Detecta la hora en España (Europe/Madrid)
+      const hour = parseInt(
+        new Intl.DateTimeFormat("es-ES", {
+          timeZone: "Europe/Madrid",
+          hour: "numeric",
+          hour12: false,
+        }).format(new Date()),
+        10
+      );
+      // Día: 8h–20h → claro. Resto (noche/amanecer) → oscuro
+      resolved = hour >= 8 && hour < 20 ? "light" : "dark";
+    }
     setTheme(resolved);
     document.documentElement.setAttribute("data-theme", resolved);
   }, []);
