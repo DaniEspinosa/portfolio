@@ -9,6 +9,21 @@
   --text-muted: #8e8e99;
   --accent: #6366f1;
   --accent-hover: #818cf8;
+  --nav-bg: rgba(12, 12, 14, 0.85);
+  --blob-opacity: 1;
+}
+
+[data-theme="light"] {
+  --background: #f5f5f7;
+  --surface: #ffffff;
+  --surface-2: #ebebf0;
+  --border: #d8d8e0;
+  --text: #0c0c0e;
+  --text-muted: #636370;
+  --accent: #6366f1;
+  --accent-hover: #4f46e5;
+  --nav-bg: rgba(245, 245, 247, 0.85);
+  --blob-opacity: 0.75;
 }
 
 @theme inline {
@@ -31,6 +46,11 @@ body {
   color: var(--text);
   font-family: var(--font-geist-sans), Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+@media (pointer: fine) {
+  body { cursor: none; }
+  a, button { cursor: none; }
 }
 
 ::selection {
@@ -64,4 +84,10 @@ body {
 @keyframes scrollPulse {
   0%, 100% { opacity: 0.4; transform: translateX(-50%) scaleY(1); }
   50%       { opacity: 1;   transform: translateX(-50%) scaleY(1.15); }
+}
+
+@keyframes scrollWheel {
+  0%        { transform: translateY(0);    opacity: 0.7; }
+  40%       { transform: translateY(6px);  opacity: 1;   }
+  80%, 100% { transform: translateY(0);    opacity: 0;   }
 }

@@ -24,7 +24,7 @@ const skillGroups: SkillGroup[] = [
     category: "Frontend",
     skills: [
       { name: "Angular",     icon: <SiAngular />,     color: "#DD0031" },
-      { name: "Next.js",     icon: <SiNextdotjs />,   color: "#ffffff" },
+      { name: "Next.js",     icon: <SiNextdotjs />,   color: "var(--text)" },
       { name: "JavaScript",  icon: <SiJavascript />,  color: "#F7DF1E" },
       { name: "TypeScript",  icon: <SiTypescript />,  color: "#3178C6" },
       { name: "HTML5",       icon: <SiHtml5 />,       color: "#E34F26" },
@@ -96,10 +96,10 @@ export default function Skills() {
       }}
     >
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, x: -40 }}
+        whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
         style={{ marginBottom: "64px" }}
       >
         <p style={{

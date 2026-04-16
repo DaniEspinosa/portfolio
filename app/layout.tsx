@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Background from "@/components/Background";
+import Cursor from "@/components/Cursor";
 import { IntroProvider } from "@/context/IntroContext";
+import { ThemeProvider } from "@/context/ThemeContext";
+import { SoundProvider } from "@/context/SoundContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,12 +44,17 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <IntroProvider>
-          <Background />
-          <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-            {children}
-          </div>
-        </IntroProvider>
+        <ThemeProvider>
+          <SoundProvider>
+          <IntroProvider>
+            <Cursor />
+            <Background />
+            <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+              {children}
+            </div>
+          </IntroProvider>
+          </SoundProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -1,7 +1,82 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, useInView, useScroll, useTransform } from "framer-motion";
 
+// — Stats counter —
+const stats = [
+  { value: 3, suffix: "+", label: "años de experiencia" },
+  { value: 2, suffix: "", label: "empresas" },
+  { value: 13, suffix: "", label: "tecnologías" },
+];
+
+function StatCounter({ value, suffix, label }: { value: number; suffix: string; label: string }) {
+  const [count, setCount] = useState(0);
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true });
+
+  useEffect(() => {
+    if (!inView) return;
+    let current = 0;
+    const step = value / (1200 / 16);
+    const timer = setInterval(() => {
+      current += step;
+      if (current >= value) { setCount(value); clearInterval(timer); }
+      else setCount(Math.floor(current));
+    }, 16);
+    return () => clearInterval(timer);
+  }, [inView, value]);
+
+  return (
+    <div ref={ref} style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+      <span style={{ fontSize: "1.75rem", fontWeight: 700, color: "var(--text)", letterSpacing: "-0.03em", lineHeight: 1 }}>
+        {count}{suffix}
+      </span>
+      <span style={{ fontSize: "0.8125rem", color: "var(--text-muted)" }}>{label}</span>
+    </div>
+  );
+}
+
+// — Typewriter — (independiente del parallax y del motion.div)
+function Typewriter({ text }: { text: string }) {
+  const [displayed, setDisplayed] = useState("");
+  const [done, setDone] = useState(false);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    let i = 0;
+    const delay = setTimeout(() => {
+      intervalRef.current = setInterval(() => {
+        i++;
+        setDisplayed(text.slice(0, i));
+        if (i >= text.length) {
+          clearInterval(intervalRef.current!);
+          setDone(true);
+        }
+      }, 50);
+    }, 900);
+
+    return () => {
+      clearTimeout(delay);
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return (
+    <span>
+      {displayed || <span style={{ opacity: 0 }}>{text[0]}</span>}
+      {!done && (
+        <motion.span
+          animate={{ opacity: [1, 0] }}
+          transition={{ duration: 0.5, repeat: Infinity }}
+          style={{ display: "inline-block", width: "2px", height: "0.85em", background: "var(--accent)", marginLeft: "3px", verticalAlign: "middle" }}
+        />
+      )}
+    </span>
+  );
+}
+
+// — Social links —
 const socialLinks = [
   {
     label: "GitHub",
@@ -34,143 +109,102 @@ const socialLinks = [
 ];
 
 export default function Hero() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] });
+  const y = useTransform(scrollYProgress, [0, 1], [0, -80]);
+
   return (
     <section
+      ref={sectionRef}
       id="inicio"
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        padding: "80px clamp(20px, 5vw, 24px) 40px",
-      }}
+      style={{ minHeight: "100vh", display: "flex", alignItems: "center", padding: "80px clamp(20px, 5vw, 24px) 40px", position: "relative" }}
     >
       <div style={{ maxWidth: "1100px", margin: "0 auto", width: "100%" }}>
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-        >
-          <p
-            style={{
-              fontSize: "0.875rem",
-              color: "var(--accent)",
-              fontWeight: 500,
-              marginBottom: "16px",
-              letterSpacing: "0.05em",
-              textTransform: "uppercase",
-            }}
+        <motion.div style={{ y }}>
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
           >
-            Hola, soy
-          </p>
+            <p style={{ fontSize: "0.875rem", color: "var(--accent)", fontWeight: 500, marginBottom: "16px", letterSpacing: "0.05em", textTransform: "uppercase" }}>
+              Hola, soy
+            </p>
 
-          <h1
-            style={{
-              fontSize: "clamp(2.5rem, 6vw, 4.5rem)",
-              fontWeight: 700,
-              lineHeight: 1.1,
-              letterSpacing: "-0.03em",
-              color: "var(--text)",
-              marginBottom: "16px",
-            }}
-          >
-            Daniel Espinosa
-          </h1>
+            <h1 style={{ fontSize: "clamp(2.5rem, 6vw, 4.5rem)", fontWeight: 700, lineHeight: 1.1, letterSpacing: "-0.03em", color: "var(--text)", marginBottom: "16px" }}>
+              Daniel Espinosa
+            </h1>
 
-          <h2
-            style={{
-              fontSize: "clamp(1.5rem, 3.5vw, 2.5rem)",
-              fontWeight: 400,
-              color: "var(--text-muted)",
-              letterSpacing: "-0.02em",
-              marginBottom: "32px",
-            }}
-          >
-            Desarrollador Web
-          </h2>
+            <h2 style={{ fontSize: "clamp(1.5rem, 3.5vw, 2.5rem)", fontWeight: 400, color: "var(--text-muted)", letterSpacing: "-0.02em", marginBottom: "32px", minHeight: "1.2em" }}>
+              <Typewriter text="Desarrollador Web" />
+            </h2>
 
-          <p
-            style={{
-              fontSize: "1.0625rem",
-              color: "var(--text-muted)",
-              maxWidth: "520px",
-              lineHeight: 1.7,
-              marginBottom: "48px",
-            }}
-          >
-            Desarrollador web desde 2023, cuando terminé el grado superior de DAM/DAW.
-            Me muevo principalmente en frontend con Angular y Next.js, aunque el backend
-            no me da miedo. Ahora mismo trabajo como desarrollador Salesforce en Ayesa
-            mientras sigo cogiendo proyectos por mi cuenta. Me adapto rápido a cualquier
-            stack y disfruto construyendo cosas que funcionen bien y se vean bien.
-          </p>
+            <p style={{ fontSize: "1.0625rem", color: "var(--text-muted)", maxWidth: "520px", lineHeight: 1.7, marginBottom: "32px" }}>
+              Desarrollador web desde 2023, cuando terminé el grado superior de DAM/DAW.
+              Me muevo principalmente en frontend con Angular y Next.js, aunque el backend
+              no me da miedo. Ahora mismo trabajo como desarrollador Salesforce en Ayesa
+              mientras sigo cogiendo proyectos por mi cuenta. Me adapto rápido a cualquier
+              stack y disfruto construyendo cosas que funcionen bien y se vean bien.
+            </p>
 
-          <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-            <a
-              href="#proyectos"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                background: "var(--accent)",
-                color: "white",
-                padding: "12px 24px",
-                borderRadius: "8px",
-                textDecoration: "none",
-                fontSize: "0.9375rem",
-                fontWeight: 500,
-                transition: "opacity 0.2s",
-              }}
-              onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.opacity = "0.85")}
-              onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.opacity = "1")}
+            <div style={{ display: "flex", gap: "32px", marginBottom: "48px" }}>
+              {stats.map((s) => <StatCounter key={s.label} {...s} />)}
+            </div>
+
+            <div style={{ display: "flex", gap: "16px", alignItems: "center", flexWrap: "wrap" }}>
+              <a
+                href="#proyectos"
+                style={{ display: "inline-flex", alignItems: "center", background: "var(--accent)", color: "white", padding: "12px 24px", borderRadius: "8px", textDecoration: "none", fontSize: "0.9375rem", fontWeight: 500, transition: "opacity 0.2s" }}
+                onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.opacity = "0.85")}
+                onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.opacity = "1")}
+              >
+                Ver proyectos
+              </a>
+              <a
+                href="/cv.pdf"
+                download="CV-DanielEspinosaMauri.pdf"
+                style={{ display: "inline-flex", alignItems: "center", gap: "8px", border: "1px solid var(--border)", color: "var(--text)", padding: "12px 24px", borderRadius: "8px", textDecoration: "none", fontSize: "0.9375rem", fontWeight: 500, transition: "border-color 0.2s, color 0.2s" }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--accent)"; (e.currentTarget as HTMLElement).style.color = "var(--accent)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--border)"; (e.currentTarget as HTMLElement).style.color = "var(--text)"; }}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Descargar CV
+              </a>
+              <a
+                href="#contacto"
+                style={{ display: "inline-flex", alignItems: "center", color: "var(--text-muted)", textDecoration: "none", fontSize: "0.9375rem", transition: "color 0.2s" }}
+                onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--text)")}
+                onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--text-muted)")}
+              >
+                Contactar →
+              </a>
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              style={{ display: "flex", gap: "20px", marginTop: "48px" }}
             >
-              Ver proyectos
-            </a>
-
-            <a
-              href="#contacto"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                color: "var(--text-muted)",
-                textDecoration: "none",
-                fontSize: "0.9375rem",
-                transition: "color 0.2s",
-              }}
-              onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--text)")}
-              onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--text-muted)")}
-            >
-              Contactar →
-            </a>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          style={{
-            display: "flex",
-            gap: "20px",
-            marginTop: "64px",
-          }}
-        >
-          {socialLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              target={link.href.startsWith("mailto") ? undefined : "_blank"}
-              rel="noopener noreferrer"
-              aria-label={link.label}
-              style={{
-                color: "var(--text-muted)",
-                transition: "color 0.2s",
-              }}
-              onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--text)")}
-              onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--text-muted)")}
-            >
-              {link.icon}
-            </a>
-          ))}
+              {socialLinks.map((link) => (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  target={link.href.startsWith("mailto") ? undefined : "_blank"}
+                  rel="noopener noreferrer"
+                  aria-label={link.label}
+                  style={{ color: "var(--text-muted)", transition: "color 0.2s" }}
+                  onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--text)")}
+                  onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--text-muted)")}
+                >
+                  {link.icon}
+                </a>
+              ))}
+            </motion.div>
+          </motion.div>
         </motion.div>
       </div>
     </section>
