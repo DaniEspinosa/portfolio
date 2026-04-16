@@ -20,13 +20,13 @@ export const metadata: Metadata = {
     "Desarrollador web desde 2023, especializado en frontend con Angular y Next.js. Trabaja en Ayesa como desarrollador Salesforce y lleva proyectos freelance propios.",
   keywords: ["desarrollador web", "frontend", "Next.js", "Angular", "portfolio"],
   authors: [{ name: "Daniel Espinosa Mauri" }],
-  metadataBase: new URL("https://portfolio-beige-nine-w4yg82e71f.vercel.app"),
+  metadataBase: new URL("https://danielespinosaportfolio.netlify.app"),
   openGraph: {
     title: "Daniel Espinosa — Desarrollador Web",
     description:
       "Desarrollador web desde 2023, especializado en frontend con Angular y Next.js. Trabaja en Ayesa como desarrollador Salesforce y lleva proyectos freelance propios.",
     type: "website",
-    url: "https://portfolio-beige-nine-w4yg82e71f.vercel.app",
+    url: "https://danielespinosaportfolio.netlify.app",
   },
 };
 
