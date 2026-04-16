@@ -1,6 +1,7 @@
 import Navigation from "@/components/Navigation";
 import LogoIntro from "@/components/LogoIntro";
 import Hero from "@/components/Hero";
+import Skills from "@/components/Skills";
 import Projects from "@/components/Projects";
 import Contact from "@/components/Contact";
 
@@ -11,6 +12,15 @@ export default function Home() {
       <LogoIntro />
       <main>
         <Hero />
+        <div
+          style={{
+            maxWidth: "1100px",
+            margin: "0 auto",
+            height: "1px",
+            background: "var(--border)",
+          }}
+        />
+        <Skills />
         <div
           style={{
             maxWidth: "1100px",

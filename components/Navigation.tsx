@@ -5,6 +5,7 @@ import { useIntro } from "@/context/IntroContext";
 
 const links = [
   { label: "Inicio", href: "#inicio" },
+  { label: "Skills", href: "#skills" },
   { label: "Proyectos", href: "#proyectos" },
   { label: "Contacto", href: "#contacto" },
 ];
