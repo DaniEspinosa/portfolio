@@ -39,6 +39,7 @@ export default function LogoIntro() {
   const [scrollDist, setScrollDist] = useState(1100);
   const [mounted, setMounted] = useState(false);
   const [gone, setGone] = useState(false);
+  const [finishing, setFinishing] = useState(false);
   const savedScrollRef = useRef(0);
   const hasFinished = useRef(false);
 
@@ -83,8 +84,9 @@ export default function LogoIntro() {
   const finishIntro = () => {
     if (hasFinished.current) return;
     hasFinished.current = true;
+    setIntroDone(true);
     flushSync(() => setGone(true));
-    window.scrollTo({ top: Math.max(0, savedScrollRef.current - scrollDist), behavior: "instant" });
+    window.scrollTo({ top: 0, behavior: "instant" });
   };
 
   useEffect(() => {
@@ -93,9 +95,9 @@ export default function LogoIntro() {
       const p = Math.min(window.scrollY / scrollDist, 1);
       setProgress(p);
       if (p >= 1 && !hasFinished.current) {
-        setIntroDone(true);
         savedScrollRef.current = window.scrollY;
-        setTimeout(finishIntro, 350);
+        setFinishing(true);        // overlay fade-in empieza (0.18s)
+        setTimeout(finishIntro, 200); // espera a que cubra
       }
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -157,7 +159,7 @@ export default function LogoIntro() {
   const extrusionAlpha = lerp(0.85, 0, eased);
   const textShadow = buildExtrusion(depth, extrusionAlpha);
   const glowOpacity = lerp(0.8, 0, eased);
-  const overlayOpacity = progress < 0.7 ? 1 : Math.max(0, 1 - (progress - 0.7) / 0.3);
+  const overlayOpacity = finishing ? 1 : (progress < 0.7 ? 1 : Math.max(0, 1 - (progress - 0.7) / 0.3));
   const hintOpacity = Math.max(0, 1 - progress * 6);
   const isFloating = progress < 0.02;
 
@@ -171,6 +173,7 @@ export default function LogoIntro() {
         zIndex: 80,
         background: "var(--background)",
         opacity: overlayOpacity,
+        transition: finishing ? "opacity 0.18s ease" : "none",
         pointerEvents: "none",
       }} />
 
@@ -196,12 +199,17 @@ export default function LogoIntro() {
           animation: isFloating ? "float 3.5s ease-in-out infinite" : "none",
         }} />
 
-        <div style={{
-          transform: `translate(${x}px, ${y}px) scale(${scale})`,
-          transformOrigin: "center center",
-          willChange: "transform",
-          animation: isFloating ? "float 3.5s ease-in-out infinite" : "none",
-        }}>
+        <div
+          onClick={() => progress < 0.05 && window.scrollTo({ top: scrollDist, behavior: "smooth" })}
+          style={{
+            transform: `translate(${x}px, ${y}px) scale(${scale})`,
+            transformOrigin: "center center",
+            willChange: "transform",
+            animation: isFloating ? "float 3.5s ease-in-out infinite" : "none",
+            cursor: progress < 0.05 ? "pointer" : "default",
+            pointerEvents: "auto",
+          }}
+        >
           <span style={{
             display: "block",
             fontWeight: 800,

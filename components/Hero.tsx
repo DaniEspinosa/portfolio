@@ -110,8 +110,8 @@ const socialLinks = [
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], [0, -80]);
+  const { scrollY } = useScroll();
+  const y = useTransform(scrollY, [0, 700], [0, -80]);
 
   return (
     <section
@@ -119,7 +119,7 @@ export default function Hero() {
       id="inicio"
       style={{ minHeight: "100vh", display: "flex", alignItems: "center", padding: "80px clamp(20px, 5vw, 24px) 40px", position: "relative" }}
     >
-      <div style={{ maxWidth: "1100px", margin: "0 auto", width: "100%" }}>
+      <div style={{ maxWidth: "1100px", margin: "0 auto", width: "100%", position: "relative" }}>
         <motion.div style={{ y }}>
           <motion.div
             initial={{ opacity: 0, y: 24 }}
