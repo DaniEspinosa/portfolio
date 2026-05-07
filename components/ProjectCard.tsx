@@ -3,14 +3,18 @@
 import { motion } from "framer-motion";
 import type { Project } from "@/data/projects";
 
-type Props = {
+type Props = Readonly<{
   project: Project;
   index: number;
-};
+}>;
 
 export default function ProjectCard({ project, index }: Props) {
   return (
-    <motion.article
+    <motion.a
+      href={project.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`Ver proyecto ${project.name}`}
       initial={{ opacity: 0, x: index % 2 === 0 ? -40 : 40 }}
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true, margin: "-60px" }}
@@ -24,13 +28,55 @@ export default function ProjectCard({ project, index }: Props) {
         flexDirection: "column",
         gap: "16px",
         transition: "border-color 0.25s, transform 0.25s",
-        cursor: "default",
+        textDecoration: "none",
+        cursor: "pointer",
       }}
       whileHover={{
         borderColor: "var(--accent)",
         y: -4,
       }}
     >
+      {/* Preview */}
+      <div
+        style={{
+          width: "100%",
+          height: "220px",
+          borderRadius: "8px",
+          overflow: "hidden",
+          border: "1px solid var(--border)",
+          background: "var(--surface-2)",
+          flexShrink: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          position: "relative",
+        }}
+      >
+        {project.image ? (
+          <>
+            <img
+              src={project.image}
+              alt={`Preview de ${project.name}`}
+              loading="lazy"
+              style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }}
+            />
+            <div style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: "60px",
+              background: "linear-gradient(to bottom, transparent, var(--surface))",
+              pointerEvents: "none",
+            }} />
+          </>
+        ) : (
+          <span style={{ fontSize: "0.8125rem", color: "var(--text-muted)", fontFamily: "var(--font-geist-mono)" }}>
+            sin preview
+          </span>
+        )}
+      </div>
+
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
         <div
@@ -66,24 +112,25 @@ export default function ProjectCard({ project, index }: Props) {
               En proceso
             </span>
           )}
-          <a
-            href={project.url}
-            target="_blank"
-            rel="noopener noreferrer"
+          <span
             style={{
-              color: "var(--text-muted)",
-              transition: "color 0.2s",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "32px",
+              height: "32px",
+              borderRadius: "8px",
+              background: "rgba(99,102,241,0.12)",
+              color: "var(--accent)",
             }}
-            onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--text)")}
-            onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--text-muted)")}
-            aria-label={`Ver ${project.name}`}
+            aria-hidden
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
               <polyline points="15 3 21 3 21 9" />
               <line x1="10" x2="21" y1="14" y2="3" />
             </svg>
-          </a>
+          </span>
         </div>
       </div>
 
@@ -129,6 +176,6 @@ export default function ProjectCard({ project, index }: Props) {
           </span>
         ))}
       </div>
-    </motion.article>
+    </motion.a>
   );
 }

@@ -32,6 +32,7 @@ export default function Navigation() {
   const [scrolled, setScrolled]   = useState(false);
   const [menuOpen, setMenuOpen]   = useState(false);
   const [isMobile, setIsMobile]   = useState(false);
+  const [activeSection, setActiveSection] = useState("inicio");
   const { introDone }             = useIntro();
   const { theme, toggleTheme }    = useTheme();
   const { muted, toggleMute }     = useSound();
@@ -46,9 +47,24 @@ export default function Navigation() {
   }, []);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
+    const onScroll = () => setScrolled(globalThis.scrollY > 20);
+    globalThis.addEventListener("scroll", onScroll);
+    return () => globalThis.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const sectionIds = links.map((l) => l.href.slice(1));
+    const observers = sectionIds.map((id) => {
+      const el = document.getElementById(id);
+      if (!el) return null;
+      const observer = new IntersectionObserver(
+        ([entry]) => { if (entry.isIntersecting) setActiveSection(id); },
+        { rootMargin: "-40% 0px -55% 0px", threshold: 0 }
+      );
+      observer.observe(el);
+      return observer;
+    });
+    return () => observers.forEach((o) => o?.disconnect());
   }, []);
 
   // Bloquea scroll del body cuando el menú está abierto
@@ -99,15 +115,39 @@ export default function Navigation() {
             /* — Desktop nav — */
             <div style={{ display: "flex", alignItems: "center", gap: "32px" }}>
               <ul style={{ display: "flex", gap: "32px", listStyle: "none", margin: 0, padding: 0 }}>
-                {links.map((link) => (
-                  <li key={link.href}>
-                    <a href={link.href} style={{ color: "var(--text-muted)", textDecoration: "none", fontSize: "0.875rem", transition: "color 0.2s", cursor: "none" }}
-                      onMouseEnter={(e) => ((e.target as HTMLElement).style.color = "var(--text)")}
-                      onMouseLeave={(e) => ((e.target as HTMLElement).style.color = "var(--text-muted)")}>
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
+                {links.map((link) => {
+                  const isActive = activeSection === link.href.slice(1);
+                  return (
+                    <li key={link.href}>
+                      <a
+                        href={link.href}
+                        style={{
+                          color: isActive ? "var(--text)" : "var(--text-muted)",
+                          textDecoration: "none",
+                          fontSize: "0.875rem",
+                          transition: "color 0.2s",
+                          cursor: "none",
+                          position: "relative",
+                        }}
+                        onMouseEnter={(e) => ((e.target as HTMLElement).style.color = "var(--text)")}
+                        onMouseLeave={(e) => ((e.target as HTMLElement).style.color = isActive ? "var(--text)" : "var(--text-muted)")}
+                      >
+                        {link.label}
+                        {isActive && (
+                          <span style={{
+                            position: "absolute",
+                            bottom: "-4px",
+                            left: 0,
+                            right: 0,
+                            height: "2px",
+                            borderRadius: "1px",
+                            background: "var(--accent)",
+                          }} />
+                        )}
+                      </a>
+                    </li>
+                  );
+                })}
               </ul>
 
               <button onClick={toggleMute} aria-label={muted ? "Activar sonido" : "Silenciar"} style={iconBtn}
